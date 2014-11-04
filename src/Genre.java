@@ -22,4 +22,13 @@ public class Genre {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() != Genre.class) {
+			return false;
+		}
+		return ((Genre)obj).getGenreId() == this.genreId;
+	}
+	
 }

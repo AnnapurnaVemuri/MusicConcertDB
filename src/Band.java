@@ -1,11 +1,18 @@
+import java.util.List;
+
 public class Band {
 	int id;
 	String name, webpage;
+	List<Artist> bandMembers;
 	
 	public Band(int id, String name, String webpage) {
 		this.id = id;
 		this.name = name;
 		this.webpage = webpage;
+	}
+	
+	public void getBandMembers(DatabaseHelper helper) {
+		helper.getMembersOfBand();
 	}
 
 	public String getName() {
@@ -31,11 +38,5 @@ public class Band {
 	public void setWebpage(String webpage) {
 		this.webpage = webpage;
 	}
-
-	public Band(int id, String webpage) {
-		this.id = id;
-		this.webpage = webpage;
-	}
-	
 	
 }

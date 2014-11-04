@@ -12,6 +12,16 @@ public class Album {
 		this.id = id;
 		this.name = name;
 	}
+	
+	public void populateDataOfAlbum(DatabaseHelper helper) {
+		genre = helper.getGenreOfAlbum(id);
+		band = helper.getBandOfAlbum(id);
+		if (band != null) {
+			band.getBandMembers(helper);
+		}
+		artist = helper.getArtistOfAlbum(id);
+		songsList = helper.getSongsInAlbum(id);
+	}
 
 	public int getId() {
 		return id;

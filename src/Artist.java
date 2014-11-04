@@ -8,4 +8,27 @@ public class Artist {
 		this.webpage = webpage;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getWebpage() {
+		return webpage;
+	}
+
+	public void setWebpage(String webpage) {
+		this.webpage = webpage;
+	}
 }

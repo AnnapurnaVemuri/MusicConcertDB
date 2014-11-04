@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -122,7 +123,7 @@ public class DatabaseHelper {
 				detailsStmt.setInt(1, concertId);
 				rs = detailsStmt.executeQuery();
 				if (rs.next()) {
-					Concert concert = new Concert(rs.getInt("concert_id"), rs.getString("name"), rs.getString("date_of_concert"), rs.getString("venue"), rs.getString("url"), this);
+					Concert concert = new Concert(rs.getInt("concert_id"), rs.getString("name"), rs.getString("date_of_concert"), rs.getString("venue"), rs.getString("url"));
 					concertList.add(concert);
 				}
 			}
@@ -448,7 +449,293 @@ public class DatabaseHelper {
 	}
 
 	public Set<Genre> getGenreOfBands(List<Band> bandsPerforming) {
-		// TODO Auto-generated method stub
+		Set<Genre> genreSet = new HashSet<Genre>();
+		for (Band band : bandsPerforming) {
+			String q1 = "select album_id from artist_album where band_id = ?";
+			String q2 = "select song_id from song_artist where band_id = ?";
+			PreparedStatement s1 = null,s2 = null;
+			ResultSet rs = null;
+			try {
+				s1 = connection.prepareStatement(q1);
+				s2 = connection.prepareStatement(q2);
+				s1.setInt(1, band.getId());
+				rs = s1.executeQuery();
+				while (rs.next()) {
+					genreSet.add(getGenreOfAlbum(rs.getInt("album_id")));
+				}
+				s2.setInt(1, band.getId());
+				rs = s2.executeQuery();
+				while (rs.next()) {
+					genreSet.add(getGenreOfAlbum(rs.getInt("song_id")));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (rs != null) {
+						rs.close();
+					}
+					if (s1 != null) {
+						s1.close();
+					}
+					if (s2 != null) {
+						s2.close();
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return genreSet;
+	}
+	
+	public Set<Genre> getGenreOfArtists(List<Artist> artistsPerforming) {
+		Set<Genre> genreSet = new HashSet<Genre>();
+		for (Artist artist : artistsPerforming) {
+			String q1 = "select album_id from artist_album where artist_id = ?";
+			String q2 = "select song_id from song_artist where artist_id = ?";
+			PreparedStatement s1 = null,s2 = null;
+			ResultSet rs = null;
+			try {
+				s1 = connection.prepareStatement(q1);
+				s2 = connection.prepareStatement(q2);
+				s1.setInt(1, artist.getId());
+				rs = s1.executeQuery();
+				while (rs.next()) {
+					genreSet.add(getGenreOfAlbum(rs.getInt("album_id")));
+				}
+				s2.setInt(1, artist.getId());
+				rs = s2.executeQuery();
+				while (rs.next()) {
+					genreSet.add(getGenreOfAlbum(rs.getInt("song_id")));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (rs != null) {
+						rs.close();
+					}
+					if (s1 != null) {
+						s1.close();
+					}
+					if (s2 != null) {
+						s2.close();
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return genreSet;
+	}
+
+	public Genre getGenreOfAlbum(int id) {
+		String q1 = "select genre_id from album_genre where album_id = ?";
+		PreparedStatement s1 = null;
+		ResultSet rs = null;
+		int genreid;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			if (rs.next()) {
+				genreid = rs.getInt("genre_id");
+				String genrename = getGenreName(genreid);
+				if (genrename != null) {
+					return new Genre(id, genrename);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return null;
+	}
+	
+	public Genre getGenreOfSong(int id) {
+		String q1 = "select genre_id from song_genre where song_id = ?";
+		PreparedStatement s1 = null;
+		ResultSet rs = null;
+		int genreid;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			if (rs.next()) {
+				genreid = rs.getInt("genre_id");
+				String genrename = getGenreName(genreid);
+				if (genrename != null) {
+					return new Genre(id, genrename);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	public String getGenreName(int id) {
+		String q1 = "select name from genre where genre_id = ?";
+		PreparedStatement s1 = null;
+		ResultSet rs = null;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			if (rs.next()) {
+				return rs.getString("name");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public Band getBandOfAlbum(int id) {
+		String q1 = "select band_id from band_album where album_id = ?";
+		String q2 = "select * from band where band_id = ?";
+		PreparedStatement s1 = null, s2 = null;
+		ResultSet rs = null, rs2 = null;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s2 = connection.prepareStatement(q2);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			if (rs.next()) {
+				s2.setInt(1, rs.getInt("band_id"));
+				rs2 = s2.executeQuery();
+				if (rs2.next()) {
+					return new Band(rs.getInt("band_id"), rs2.getString("name"), rs2.getString("webpage"));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public Artist getArtistOfAlbum(int id) {
+		String q1 = "select artist_id from artist_album where album_id = ?";
+		String q2 = "select * from artist where artist_id = ?";
+		PreparedStatement s1 = null, s2 = null;
+		ResultSet rs = null, rs2 = null;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s2 = connection.prepareStatement(q2);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			if (rs.next()) {
+				s2.setInt(1, rs.getInt("artist_id"));
+				rs2 = s2.executeQuery();
+				if (rs2.next()) {
+					return new Artist(rs.getInt("artist_id"), rs2.getString("name"), rs2.getString("webpage"));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+				if (s2 != null) {
+					s2.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public List<Song> getSongsInAlbum(int id) {
+		String q1 = "select song_id from song_album where album_id = ?";
+		String q2 = "select * from song where song_id = ?";
+		List<Song> songList = new ArrayList<Song>();
+		PreparedStatement s1 = null, s2 = null;
+		ResultSet rs = null, rs2 = null;
+		try {
+			s1 = connection.prepareStatement(q1);
+			s2 = connection.prepareStatement(q2);
+			s1.setInt(1, id);
+			rs = s1.executeQuery();
+			while (rs.next()) {
+				s2.setInt(1, rs.getInt("song_id"));
+				rs2 = s2.executeQuery();
+				if (rs2.next()) {
+					songList.add(new Song(rs.getInt("song_id"), rs2.getString("name"), rs2.getString("video_link")));
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) {
+					rs.close();
+				}
+				if (rs2 != null) {
+					rs2.close();
+				}
+				if (s1 != null) {
+					s1.close();
+				}
+				if (s2 != null) {
+					s2.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return songList;
 	}
 }
