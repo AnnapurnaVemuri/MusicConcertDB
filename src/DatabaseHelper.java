@@ -435,7 +435,7 @@ public class DatabaseHelper {
 					rs.close();
 				}
 				if (stmt != null) {
-					stsmt.close();
+					stmt.close();
 				}
 				if (detailsStmt != null) {
 					detailsStmt.close();
