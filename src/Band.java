@@ -1,5 +1,9 @@
 import java.util.List;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public class Band {
 	int id;
 	String name, webpage;
@@ -12,7 +16,7 @@ public class Band {
 	}
 	
 	public void getBandMembers(DatabaseHelper helper) {
-		helper.getMembersOfBand();
+		bandMembers = helper.getMembersOfBand(id);
 	}
 
 	public String getName() {
@@ -37,6 +41,22 @@ public class Band {
 
 	public void setWebpage(String webpage) {
 		this.webpage = webpage;
+	}
+	
+	public String getJsonObjectString() {
+		return getJsonObject().toString();
+	}
+
+	public JsonElement getJsonObject() {
+		JsonObject mainObj = new JsonObject();
+		mainObj.addProperty("name", name);
+		mainObj.addProperty("webpage", webpage);
+		JsonArray artistArray = new JsonArray();
+		for (Artist a: bandMembers) {
+			artistArray.add(a.getJsonObject());
+		}
+		mainObj.add("artistsInBand", artistArray);
+		return mainObj;
 	}
 	
 }

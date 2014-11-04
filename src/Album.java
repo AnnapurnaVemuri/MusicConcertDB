@@ -1,5 +1,9 @@
 import java.util.List;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public class Album {
 	int id;
 	String name;
@@ -70,6 +74,18 @@ public class Album {
 	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
-	
+
+	public JsonElement getJsonObject() {
+		JsonObject mainObj = new JsonObject();
+		mainObj.addProperty("name", name);
+		mainObj.add("band", band.getJsonObject());
+		mainObj.add("artist", artist.getJsonObject());
+		JsonArray songArray = new JsonArray();
+		for (Song s: songsList) {
+			songArray.add(s.getJsonObject());
+		}
+		mainObj.add("songsInAlbum", songArray);
+		return mainObj;
+	}
 	
 }

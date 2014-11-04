@@ -1,3 +1,7 @@
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public class Artist {
 	int id;
 	String name, webpage;
@@ -30,5 +34,16 @@ public class Artist {
 
 	public void setWebpage(String webpage) {
 		this.webpage = webpage;
+	}
+	
+	public String getJsonObjectString() {
+		return getJsonObject().toString();
+	}
+
+	public JsonElement getJsonObject() {
+		JsonObject mainObj = new JsonObject();
+		mainObj.addProperty("name", name);
+		mainObj.addProperty("webpage", webpage);
+		return mainObj;
 	}
 }
