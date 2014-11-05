@@ -1,7 +1,5 @@
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 
 public class Song {
 	int id;
@@ -45,6 +43,9 @@ public class Song {
 		genre = helper.getGenreOfSong(id);	
 		artist = helper.getArtistOfSong(id);
 		band = helper.getBandOfSong(id);
+		if (band != null) {
+			band.getBandMembers(helper);
+		}
 		album = helper.getAlbumOfSong(id);
 	}
 
@@ -52,9 +53,23 @@ public class Song {
 		JsonObject mainObj = new JsonObject();
 		mainObj.addProperty("name", name);
 		mainObj.addProperty("link", videoLink);
-		mainObj.add("band", band.getJsonObject());
-		mainObj.add("album", album.getJsonObject());
-		mainObj.add("artist", artist.getJsonObject());
+		if (band != null) {
+			mainObj.add("band", band.getJsonObject());
+		}
+		if (album != null) {
+			mainObj.add("album", album.getJsonObject());
+		}
+		if (artist != null) {
+			mainObj.add("artist", artist.getJsonObject());
+		}
 		return mainObj;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() == Song.class && ((Song)obj).id == this.id) {
+			return true;
+		}
+		return false;
 	}
 }

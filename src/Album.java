@@ -1,4 +1,7 @@
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -9,7 +12,7 @@ public class Album {
 	String name;
 	Band band;
 	Artist artist;
-	List<Song> songsList;
+	List<Song> songsList = new ArrayList<Song>();
 	Genre genre;
 	
 	public Album(int id, String name) {
@@ -25,6 +28,9 @@ public class Album {
 		}
 		artist = helper.getArtistOfAlbum(id);
 		songsList = helper.getSongsInAlbum(id);
+		for (Song s : songsList) {
+			s.populateDetailsOfSong(helper);
+		}
 	}
 
 	public int getId() {
@@ -78,8 +84,12 @@ public class Album {
 	public JsonElement getJsonObject() {
 		JsonObject mainObj = new JsonObject();
 		mainObj.addProperty("name", name);
-		mainObj.add("band", band.getJsonObject());
-		mainObj.add("artist", artist.getJsonObject());
+		if (band != null) {
+			mainObj.add("band", band.getJsonObject());
+		}
+		if (artist != null) {
+			mainObj.add("artist", artist.getJsonObject());		
+		}
 		JsonArray songArray = new JsonArray();
 		for (Song s: songsList) {
 			songArray.add(s.getJsonObject());
@@ -88,4 +98,15 @@ public class Album {
 		return mainObj;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() == Album.class && ((Album)obj).id == this.id) {
+			return true;
+		}
+		return false;
+	}
+
+	public Set<Band> suggestBands(DatabaseHelper helper) {
+		return helper.getBandsOfGenre(genre.getGenreId());
+	}
 }

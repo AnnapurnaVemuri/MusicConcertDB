@@ -1,4 +1,3 @@
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -45,5 +44,13 @@ public class Artist {
 		mainObj.addProperty("name", name);
 		mainObj.addProperty("webpage", webpage);
 		return mainObj;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj.getClass() == Artist.class && ((Artist)obj).id == this.id) {
+			return true;
+		}
+		return false;
 	}
 }
